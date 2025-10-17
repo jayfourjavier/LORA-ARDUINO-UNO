@@ -11,7 +11,7 @@
 
 DHT dht(DHT22_PIN, DHT_TYPE);
 
-byte sensorNodeId = 2; // ID of this sensor node
+byte sensorNodeId = 3; // ID of this sensor node
 float temperature = 0.0;
 float humidity = 0.0;
 float moisture = 0.0;
@@ -55,13 +55,6 @@ void readSensors()
   }
   else
   {
-    Serial.println("DHT22 read successfully");
-    Serial.print("Humidity: ");
-    Serial.print(_humidity);
-    Serial.print(" %\t");
-    Serial.print("Temperature: ");
-    Serial.print(_temperature);
-    Serial.println(" *C ");
 
     humidity = _humidity;
     temperature = _temperature;
