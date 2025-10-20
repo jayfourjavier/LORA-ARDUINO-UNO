@@ -66,6 +66,7 @@ void setup()
   Serial.begin(9600);
   dht.begin();
 
+  // Lora Module 433Mhz
   if (!LoRa.begin(433E6))
   {
     Serial.println("Starting LoRa failed!");
@@ -78,10 +79,8 @@ void setup()
   LoRa.setSyncWord(0xFF);
 }
 
-void loop()
+void printReadings()
 {
-
-  readSensors();
   Serial.print("Temperature: ");
   Serial.print(temperature);
   Serial.print(" °C | Humidity: ");
@@ -91,13 +90,21 @@ void loop()
   Serial.print(" | Soil Moisture: ");
   Serial.print(moisture);
   Serial.print(" %");
+}
 
+void submitReadings()
+{
   String loraMsg = loraMessage();
   Serial.println(" | LoRa Msg: " + loraMsg);
-  // Send LoRa packet to receiver
   LoRa.beginPacket();
   LoRa.print(loraMsg);
   LoRa.endPacket();
+}
 
+void loop()
+{
+  readSensors();
+  printReadings();
+  submitReadings();
   delay(1000);
 }
