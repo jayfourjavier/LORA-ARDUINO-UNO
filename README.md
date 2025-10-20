@@ -2,6 +2,8 @@
 
 This project is an **Arduino-based LoRa transmitter node** that reads environmental data from a **DHT22 sensor** (temperature and humidity) and a **soil moisture sensor**, then sends the readings wirelessly via a **LoRa module (433 MHz)**.
 
+**Receiver Node:** [LORA-ESP32-CONTROLLER-NODE](https://github.com/jayfourjavier/LORA-ESP32-CONTROLLER-NODE)
+
 ---
 
 ## Overview
@@ -9,7 +11,9 @@ This project is an **Arduino-based LoRa transmitter node** that reads environmen
 The sensor node performs the following:
 
 1. Reads **temperature** and **humidity** using a DHT22 sensor.
+
 2. Reads and averages **soil moisture** data from an analog sensor.
+
 3. Formats the readings into a LoRa message string:
 
    ```
@@ -43,11 +47,7 @@ The sensor node performs the following:
 | 11           | LoRa MOSI          | SPI MOSI                 |
 | 12           | LoRa MISO          | SPI MISO                 |
 | 13           | LoRa SCK           | SPI Clock                |
-| 9            | LoRa RST           | LoRa module Reset Pin    |
-| 2            | LoRa DI00          | LoRa module DI00 Pin     |
 | GND, 3.3V/5V | Common Power Lines | Shared by all components |
-
-> **Note:** Most LoRa modules are **3.3V** devices. Use a **logic level shifter** if using a 5V Arduino.
 
 ---
 
@@ -55,26 +55,26 @@ The sensor node performs the following:
 
 ### Sensor Reading
 
-* **DHT22:** Temperature and humidity are read via the DHT library.
-* **Soil Moisture:** Analog readings are averaged over `moistureSampleCount` samples for stability.
+* **DHT22:** Reads temperature and humidity via the Adafruit DHT library.
+* **Soil Moisture:** Analog readings are averaged across several samples for stability.
 
 ```cpp
 float moisturePercent = map(average, zeroMoisture, hundredMoisture, 0, 100);
 ```
 
-You can adjust `zeroMoisture` and `hundredMoisture` to calibrate based on your soil sensor.
+You can adjust `zeroMoisture` and `hundredMoisture` for sensor calibration.
 
 ---
 
 ### LoRa Transmission
 
-The message is sent in a CSV format for easy parsing on the receiver side:
+The data is sent as a comma-separated string for easy parsing:
 
 ```cpp
 S,<node_id>,<temperature>,<humidity>,<moisture>,E
 ```
 
-Example:
+**Example:**
 
 ```
 S,3,29.40,63.20,45.00,E
@@ -92,23 +92,23 @@ Temperature: 29.40 °C | Humidity: 63.20 % | Soil Moisture: 45.00 % | LoRa Msg: 
 
 ## Library Dependencies
 
-Install these libraries via **Arduino Library Manager**:
+Install the following via the **Arduino Library Manager**:
 
 * **LoRa** by Sandeep Mistry
 * **DHT sensor library** by Adafruit
-* **Adafruit Unified Sensor** (dependency for DHT library)
+* **Adafruit Unified Sensor** (required by the DHT library)
 
 ---
 
 ## Transmission Interval
 
-Currently set to transmit every **1 second**:
+Default: **1 second**
 
 ```cpp
 delay(1000);
 ```
 
-You can modify this to a longer interval to save power, e.g.:
+To reduce power usage, increase the interval:
 
 ```cpp
 delay(60000); // Send every 60 seconds
@@ -118,29 +118,35 @@ delay(60000); // Send every 60 seconds
 
 ## Calibration Notes
 
-* `zeroMoisture` = sensor value in **dry air** (≈1023 for most analog sensors).
-* `hundredMoisture` = sensor value in **water-saturated soil** (≈0).
-* Reverse these if your sensor outputs inverted values.
+| Variable          | Description                                         | Typical Value |
+| ----------------- | --------------------------------------------------- | ------------- |
+| `zeroMoisture`    | Analog value when sensor is in dry soil             | 1023          |
+| `hundredMoisture` | Analog value when sensor is in wet soil (saturated) | 0             |
+
+If your sensor outputs inverted values, swap the two.
 
 ---
 
 ## Example Use Case
 
-This transmitter can be paired with a **LoRa receiver node** or a **base station** that:
+This transmitter can be paired with a **LoRa receiver node** or **base station** that:
 
 * Receives and parses LoRa messages
-* Displays data on an LCD, Serial Monitor, or sends it to a web dashboard
+* Displays data on an LCD, serial monitor, or sends to a web dashboard
+
+See companion project:
+[LORA-ESP32-CONTROLLER-NODE](https://github.com/jayfourjavier/LORA-ESP32-CONTROLLER-NODE)
 
 ---
 
 ## License
 
-MIT License © 2025 — You are free to use, modify, and distribute with attribution.
+**MIT License © 2025**
+You are free to use, modify, and distribute with attribution.
 
 ---
 
 ## Author
 
 **Jay Four Javier**
-
-Prototype Fabricator, Systems Developer
+Prototype Fabricator · Systems Developer
